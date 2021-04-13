@@ -10,10 +10,15 @@
 *         + -> 5V
 *         G -> GND
 *         A0 -> -
+*         
+* output in V (for comparability to other voltage measurement methods (e.g ADC1115)
 */
 
 int hallpin = A0;
-int value;
+double value;
+
+//conversion factor dependent on used voltege measurement
+float conversion = 5.0 / 4096.0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -21,7 +26,7 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  value = analogRead(hallpin);
-  Serial.println(value);
+  value = double(analogRead(hallpin));
+  value = value * conversion;
+  Serial.println(value, 7);  // in V
 }
