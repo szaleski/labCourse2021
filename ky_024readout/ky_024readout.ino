@@ -29,4 +29,6 @@ void loop() {
   value = double(analogRead(hallpin));
   value = value * conversion;
   Serial.println(value, 7);  // in V
+
+  delay(100);
 }
