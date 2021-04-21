@@ -30,5 +30,5 @@ void loop() {
   value = value * conversion;
   Serial.println(value, 7);  // in V
 
-  delay(100);
+  delay(500);
 }

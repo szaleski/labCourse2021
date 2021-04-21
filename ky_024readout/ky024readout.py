@@ -19,6 +19,7 @@ def measure(number, name, datapath = 'calibration data/', save=True):
     specified in datapath with filename name
     '''
     global ser
+    ser.reset_input_buffer()
     
     hallvoltages = []      #list with measured voltages in Volt
     
