@@ -4,12 +4,11 @@
 **
 ** Date: Apr. 12 2021
 **
-** Readout Code for KY-024 Hall Sensor:
+** Readout Code for KY-003 Hall Sensor:
 *  Wiring: sensor -> arduino
-*         D0 -> A0
-*         + -> 5V
-*         G -> GND
-*         A0 -> -
+*         Signal -> PIN 12
+*         +V -> 5V
+*         GND -> GND
 */
 
 int hallpin = 12;
