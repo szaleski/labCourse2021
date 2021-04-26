@@ -43,9 +43,9 @@ void setup(void)
   }
 
   // Set resolution, per axis
-  sensor.setResolution(MLX90393_X, MLX90393_RES_16);
-  sensor.setResolution(MLX90393_Y, MLX90393_RES_16);
-  sensor.setResolution(MLX90393_Z, MLX90393_RES_16);
+  sensor.setResolution(MLX90393_X, MLX90393_RES_19);
+  sensor.setResolution(MLX90393_Y, MLX90393_RES_19);
+  sensor.setResolution(MLX90393_Z, MLX90393_RES_19);
 
   // Set oversampling
   sensor.setOversampling(MLX90393_OSR_2);
