@@ -11,6 +11,8 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
+#use context manager?
+
 
 
 def measure(number, name, datapath = 'calibration data/', save=True):
@@ -69,14 +71,14 @@ def fastEval():
 
 
 ser = serial.Serial('COM3', 9600)
-number = 100      #number of data points to be collected
+number = 10    #number of data points to be collected
 
 try:
 
     while True:
         inputstr = input('For next measurement type in current B-Field in mT:')
         
-        measure(number, inputstr)
+        measure(number, inputstr, '')
 
     # fastEval()    
     ser.close()

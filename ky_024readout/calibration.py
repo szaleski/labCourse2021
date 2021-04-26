@@ -10,7 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.misc import derivative
 from scipy.optimize import curve_fit
-
+import scipy.odr
+from uncertainties import unumpy as unp
 
 
 
@@ -52,11 +53,25 @@ def chi2(func, fitparams, xdata, ydata, yerr, xerr=None ):
     return np.sum((ydata - val)**2 / effVar)
 
 
+def odr_fit(fit, xdata, ydata, xerr, yerr, p0, ddof=0):
+    
+    model  = scipy.odr.Model(lambda x,y: fit(y, *x))
+    data   = scipy.odr.RealData(xdata, ydata, sx=xerr, sy=yerr)
+    odr    = scipy.odr.ODR(data, model, beta0 = p0)
+    output = odr.run()
+    popt = output.beta
+    pcov = output.cov_beta
+    ndof = len(xdata)-len(p0)-ddof
+    chiq = output.res_var*ndof
+    
+    chiq = chi2(fit, popt, xdata, ydata, yerr, xerr)
+
+    return popt, pcov, chiq
 
 
 
 def fitPlot(model, param, xdata, ydata, yerr, xerr=None, \
-            labels= { 'xlabel': 'B-Field in mT', 'ylabel': 'reziprokal ouput voltage in 1/V', \
+            labels= { 'xlabel': 'B-Field in mT', 'ylabel': 'negaitive ouput voltage in 1/V', \
                      'data': 'Measured Values', 'fitmodel': None, 'chipos': None}):
     '''
     Erzeugt vollen Anpassungsplot mit Residuen und Fehlern.
@@ -91,7 +106,7 @@ def fitPlot(model, param, xdata, ydata, yerr, xerr=None, \
         chiqdof = chiq / ndof
         boxtext = '$\chi^2$/dof = %g / %g = %3.2f' % (chiq, ndof, chiqdof)
         xbox=(max(xdata) - min(xdata))*1/100 + min(xdata)
-        ybox=(max(ydata) - min(ydata))*5/10 + min(ydata)
+        ybox=(max(ydata) - min(ydata))*6/10 + min(ydata)
         ax1.text(xbox,ybox,boxtext, bbox={'facecolor': 'aqua', 'alpha': 0.8, 'pad': 10})
     
     #Residuenplot
@@ -125,18 +140,30 @@ plt.ylabel('Sensor output in V')
 plt.xlabel('B-Field in mT')
 plt.plot(bfields, hallvolts, 'o')
 
-plt.figure('inversed Hall Voltages2')
-plt.ylabel('reciprocal Sensor Output in 1/V')
+plt.figure('inversed Hall Voltages')
+plt.ylabel('negative Sensor Output in 1/V')
 plt.xlabel('B-Field in mT')
-plt.plot(bfields, ihallvolts, 'o')
+plt.plot(bfields, -hallvolts, 'o')
 
-# dU = 5/4096
+dU = 5/4096
+dB = 1/np.sqrt(12)
 # dihall = dU / (hallvolts*(hallvolts+dU))
+dhall = dU *np.ones(len(hallvolts))
 
-# mask = bfields < 150
-# bfields, ihallvolts, dihall = bfields[mask], ihallvolts[mask], dihall[mask] 
+mask = bfields < 50
+bfields, hallvolts, dhall = bfields[mask], -hallvolts[mask], dhall[mask] 
+dB *= np.ones(len(bfields))
 
-# popt, pcorr = curve_fit(gerade, bfields, ihallvolts, sigma=dihall)
-# fitPlot(gerade, popt, bfields, ihallvolts, dihall)
+
+popt, pcorr, chiq = odr_fit(gerade, bfields, hallvolts, xerr=dB, yerr=dhall, \
+                            p0=[ 0.00741037, -0.63259032])
+pcorr = np.sqrt(np.diag(pcorr))
+factor = np.array([1000, 1])
+
+labels= { 'xlabel': 'B-Field in mT', 'ylabel': 'negative ouput voltage in V', \
+                     'data': 'Measured Values', \
+        'fitmodel': 'Parameters:\na = {:.2u} µT/V \nb={:.2u} mT'\
+            .format(*(unp.uarray(popt, pcorr)*factor)), 'chipos': None}
+fitPlot(gerade, popt, bfields, hallvolts, yerr=dhall, xerr=dB, labels=labels)
 
 
