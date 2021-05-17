@@ -23,7 +23,7 @@
 
 const byte OLED = 1;                      // Turn on/off the OLED [1,0]
 
-const int SIGNAL_THRESHOLD      = 50;    // Min threshold to trigger on. See calibration.pdf for conversion to mV.
+const int SIGNAL_THRESHOLD      = 30 ;    // Min threshold to trigger on. See calibration.pdf for conversion to mV.
 const int RESET_THRESHOLD       = 15;    
 
 const int LED_BRIGHTNESS        = 255;    // Brightness of the LED [0,255]
@@ -103,7 +103,7 @@ void setup() {
   Serial.println(F("##########################################################################################"));
 
   get_detector_name(detector_name);
-  Serial.println(detector_name);
+//   Serial.println(String(detector_name));
   get_time();
   delay(900);
   start_time = millis();
@@ -166,14 +166,17 @@ void loop()
           analogWrite(3, LED_BRIGHTNESS);
           sipm_voltage = get_sipm_voltage(adc);
           last_sipm_voltage = sipm_voltage; 
-          Serial.println((String)count + " " + time_stamp+ " " + adc+ " " + sipm_voltage+ " " + measurement_deadtime+ " " + temperatureC);}
+
+          Serial.print((String)count + " "); Serial.print(time_stamp / 1000.0, 4); 
+          Serial.println((String)" " + adc+ " " + sipm_voltage+ " " + measurement_deadtime+ " " + temperatureC);}
   
       if (SLAVE == 1) {
           if (keep_pulse == 1) {   
               analogWrite(3, LED_BRIGHTNESS);
               sipm_voltage = get_sipm_voltage(adc);
               last_sipm_voltage = sipm_voltage; 
-              Serial.println((String)count + " " + time_stamp+ " " + adc+ " " + sipm_voltage + " " + measurement_deadtime+ " " + temperatureC);}}
+              Serial.print((String)count + " "); Serial.print(time_stamp / 1000.0, 4); 
+              Serial.println((String)" " + adc+ " " + sipm_voltage+ " " + measurement_deadtime+ " " + temperatureC);}}
       
       keep_pulse = 0;
       digitalWrite(3, LOW);
@@ -295,4 +298,3 @@ boolean get_detector_name(char* det_name)
     if ((ch != 0x00) && (bytesRead >= 1)) {det_name[bytesRead - 1] = 0;}
     return true;
 }
-
