@@ -55,36 +55,46 @@ except KeyboardInterrupt:
     #     restbuffer1 = p1.stdout.readlines() 
     #     print(restbuffer1)
         
-    for i in range(2):
-        try:
-            arr = [arr1, arr2][i]
-            p = [p1, p2][0]
+    # for i in range(2):
+    #     try:
+    #         arr = [arr1, arr2][i]
+    #         p = [p1, p2][0]
             
-            restbuffer = str(p.communicate(timeout=20)[0], 'utf-8')
-            print(restbuffer)
+    #         restbuffer = str(p.communicate(timeout=20)[0], 'utf-8')
+    #         print(restbuffer)
         
-            for line in restbuffer.split('\n'):
-                datapoint = np.array( line.split(' '), dtype=float)
-                arr = np.concatenate((arr, datapoint[np.newaxis,:2]), axis=0)
+    #         for line in restbuffer.split('\n'):
+    #             datapoint = np.array( line.split(' '), dtype=float)
+    #             arr = np.concatenate((arr, datapoint[np.newaxis,:2]), axis=0)
             
-        except TimeoutExpired:
-            print(f'No further buffer for COM{5+i}')
-        # except:
-        #     print('[ERROR] an error ocurred during termination. Continuing anyway')
+    #     except TimeoutExpired:
+    #         print(f'No further buffer for COM{5+i}')
+    #     # except:
+    #     #     print('[ERROR] an error ocurred during termination. Continuing anyway')
 
-    p1.terminate()
-    p2.terminate()
+    p1.kill()
+    p2.kill()
 
 print('saving data...')
+
+#reading data from txt files as buffer handling is not stable at long measurements
+arr1 = np.loadtxt('COM5data.txt', skiprows=10)[:,0:2]
+arr2 = np.loadtxt('COM6data.txt', skiprows=3)
+
 p1Data = pd.DataFrame(arr1, columns = ['counts1', 'time1'])
 p2Data = pd.DataFrame(arr2, columns = ['counts2', 'time2'])
-
-p1Data[['counts2', 'time2']] = p2Data
-p1Data.to_csv('measurement2.csv', sep=';')
-
 
 rate1 = arr1[-1,0]/(t1-t0) #watch
 rate2 = arr2[-1,0]/(t1-t0) #pin
 
 print(f'The final rates are: \nWatch: f={round(rate1, 3)} Hz\tPIN: f={round(rate2, 3)} Hz')
-    
+
+p1Data[['counts2', 'time2']] = p2Data
+
+mask = np.zeros(len(p1Data.index))
+mask[0] = 1
+mask[1:] = np.NaN
+p1Data[['measurement time [s]']] = mask * (t1-t0)
+p1Data[['rate Cosmic [Hz]']] = mask * rate1
+p1Data[['rate PIN [Hz]']] = mask * rate2
+p1Data.to_csv('measurement3.csv', sep=';')

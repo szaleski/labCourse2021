@@ -8,9 +8,12 @@ import sys
 import serial
 
 with serial.Serial(port=sys.argv[1],baudrate=int(sys.argv[2])) as ser:
-    while True:  # The program never ends... will be killed when master is over.
+    with open(sys.argv[1]+'data.txt', 'w') as file:
+        while True:  # The program never ends... will be killed when master is over.
 
-        output = ser.readline() # read output
+            output = ser.readline() # read output
 
-        sys.stdout.write(str(output, 'utf-8')) # write output to stdout
-        sys.stdout.flush()
+            file.write(str(output, 'utf-8'))
+
+            sys.stdout.write(str(output, 'utf-8')) # write output to stdout
+            sys.stdout.flush()

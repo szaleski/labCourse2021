@@ -2,7 +2,7 @@ int sigPin = 2;
 
 int sigCount = 0;
 int sigFlag=0;        //flag to listen for signal counts from the PIN circuit
-float currentTime=0;
+unsigned long currentTime=0;
 int prevTime=0;
 int seconds=0;
 
