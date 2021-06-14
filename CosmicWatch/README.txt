@@ -44,5 +44,10 @@ measureRate.py: Script initially created to replace an OLED screen
             serial monitor into a textfile, which was then converted by excel to .csv. This was only useful
             to avoid changing evaluate.py and does not need to be continued.
 
-
+    /differentFloors: With these measurements the measured rate can be compared between ground level
+                        (lab course rooms) and 5th floor
+        - lowerfloor.txt: measurement with CosmicWatch1 at Stern Gerlach room
+        - upperfloor.txt: measurement with CosmicWatch2 at 5th floor, stopped working after 26mins
+        - upperfloor_working.txt: measurement with CosmicWatch1 at 5th floor, no problems
+        - gemlab.txt: measurements taken with CosmicWatch1 at Gemlab during setup for coincidence
 
